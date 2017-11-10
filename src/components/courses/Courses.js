@@ -1,4 +1,8 @@
 import React from "react";
+import {connect} from 'react-redux';
+import * as courseActions from '../../actions/CourseActions';
+import * as PropTypes from "react/lib/ReactPropTypes";
+import {bindActionCreators} from 'redux';
 
 class Courses extends React.Component {
     constructor(props, context) {
@@ -21,7 +25,11 @@ class Courses extends React.Component {
     }
 
     onClickSave() {
-        alert(`Saving ${this.state.course.title}`);
+        this.props.actions.createCourse(this.state.course);
+    }
+
+    courseRow(course, index) {
+        return <div key={index}>{course.title}</div>;
     }
 
 
@@ -30,6 +38,7 @@ class Courses extends React.Component {
             <div>
                 <h1>Courses</h1>
 
+                {this.props.courses.map(this.courseRow)}
                 <input
                     type='text'
                     onChange={this.onTitleChange}
@@ -41,4 +50,21 @@ class Courses extends React.Component {
     }
 }
 
-export default Courses;
+Courses.propTypes = {
+    courses: PropTypes.array.isRequired,
+    actions: PropTypes.object.isRequired
+};
+
+function mapStateToProps(state, ownProps) {
+    return {
+      courses: state.courseReducer
+    };
+}
+
+function mapDispatchToProps(dispatch) {
+    return {
+        actions: bindActionCreators(courseActions, dispatch)
+    };
+}
+
+export default connect(mapStateToProps, mapDispatchToProps) (Courses);
